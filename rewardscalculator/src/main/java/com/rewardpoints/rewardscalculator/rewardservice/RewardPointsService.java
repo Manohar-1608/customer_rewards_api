@@ -13,8 +13,19 @@ import com.rewardpoints.rewardscalculator.dto.RewardPointsDTO;
 import com.rewardpoints.rewardscalculator.entity.Transaction;
 import com.rewardpoints.rewardscalculator.repository.TransactionRepository;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class RewardPointsService {
+
+    @PostConstruct
+    public void initData() {
+	repository.save(new Transaction("C1", "Mohan", LocalDate.of(2025, 5, 10), 120));
+	repository.save(new Transaction("C1", "Mohan", LocalDate.of(2025, 6, 15), 75));
+	repository.save(new Transaction("C1", "Mohan", LocalDate.of(2025, 7, 5), 40));
+	repository.save(new Transaction("C2", "Anant", LocalDate.of(2025, 5, 12), 200));
+	repository.save(new Transaction("C2", "Anant", LocalDate.of(2025, 6, 18), 90));
+    }
 
     @Autowired
     private TransactionRepository repository;

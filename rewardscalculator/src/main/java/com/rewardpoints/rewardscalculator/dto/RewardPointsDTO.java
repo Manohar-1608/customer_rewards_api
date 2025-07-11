@@ -17,6 +17,10 @@ public class RewardPointsDTO {
 	this.totalPoints = totalPoints;
     }
 
+    public RewardPointsDTO() {
+
+    }
+
     public String getCustomerId() {
 	return customerId;
     }
@@ -31,6 +35,16 @@ public class RewardPointsDTO {
 
     public int getTotalPoints() {
 	return totalPoints;
+    }
+
+    public void setCustomerId(String customerId) {
+	this.customerId = customerId;
+
+    }
+
+    public void setTotalPoints(int totalPoints) {
+	this.totalPoints = totalPoints;
+
     }
 
 }

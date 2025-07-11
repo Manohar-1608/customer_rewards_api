@@ -2,7 +2,6 @@ package com.rewardpoints.rewardscalculator.controller;
 
 import java.time.LocalDate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +14,28 @@ import com.rewardpoints.rewardscalculator.dto.RewardPointsDTO;
 import com.rewardpoints.rewardscalculator.rewardservice.RewardPointsService;
 
 @RestController
-@RequestMapping("/api/rewardpoints")
-public class PointeCalculatorController {
+@RequestMapping("/api/reward-points")
+public class PointsCalculatorController {
 
-    @Autowired
-    private RewardPointsService rewardService;
+    private final RewardPointsService rewardService;
 
-    @GetMapping(value = "/countpoints")
+    public PointsCalculatorController(RewardPointsService rewardService) {
+	this.rewardService = rewardService;
+    }
+
+    @GetMapping(value = "/count-points")
     public ResponseEntity<RewardPointsDTO> getRewards(@RequestParam String customerId,
 	    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
 	    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-	return new ResponseEntity<>(rewardService.calculateRewards(customerId, from, to), HttpStatus.OK);
+
+	if (customerId == null || customerId.isBlank()) {
+	    throw new IllegalArgumentException("Customer ID must not be null or blank.");
+	}
+
+	if (from == null || to == null || from.isAfter(to)) {
+	    throw new IllegalArgumentException("Invalid date range: 'from' must be before 'to'. ");
+	}
+
+	return new ResponseEntity<>(rewardService.calculateRewards(customerId, from, to), HttpStatus.ACCEPTED);
     }
 }

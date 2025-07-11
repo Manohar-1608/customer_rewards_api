@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.rewardpoints.rewardscalculator.dto.RewardPointsDTO;
 import com.rewardpoints.rewardscalculator.entity.Transaction;
+import com.rewardpoints.rewardscalculator.exception.CustomerNotFoundException;
 import com.rewardpoints.rewardscalculator.repository.TransactionRepository;
+import com.rewardpoints.rewardscalculator.utils.RewardConstants;
 
 import jakarta.annotation.PostConstruct;
 
@@ -27,20 +28,27 @@ public class RewardPointsService {
 	repository.save(new Transaction("C2", "Anant", LocalDate.of(2025, 6, 18), 90));
     }
 
-    @Autowired
-    private TransactionRepository repository;
+    private final TransactionRepository repository;
+
+    public RewardPointsService(TransactionRepository repository) {
+	this.repository = repository;
+    }
 
     public RewardPointsDTO calculateRewards(String customerId, LocalDate from, LocalDate to) {
 	List<Transaction> customerTxns = repository.findByCustomerIdAndDateBetween(customerId, from, to);
 
+	if (customerTxns == null || customerTxns.isEmpty()) {
+	    throw new CustomerNotFoundException("No transactions found for customer ID : " + customerId);
+	}
+
 	Map<String, Integer> monthlyPoints = new HashMap<>();
-	int total = 0;
-	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM");
+	int total = RewardConstants.ZERO;
+	DateTimeFormatter fmt = DateTimeFormatter.ofPattern(RewardConstants.MONTH_FORMAT);
 
 	for (Transaction txn : customerTxns) {
 	    int points = calculatePoints(txn.getAmount());
 	    String month = txn.getDate().format(fmt);
-	    monthlyPoints.put(month, monthlyPoints.getOrDefault(month, 0) + points);
+	    monthlyPoints.put(month, monthlyPoints.getOrDefault(month, RewardConstants.ZERO) + points);
 	    total += points;
 	}
 
@@ -51,11 +59,12 @@ public class RewardPointsService {
     }
 
     private int calculatePoints(double amount) {
-	int points = 0;
-	if (amount > 100)
-	    points += (int) (2 * (amount - 100)) + 50;
-	else if (amount > 50)
-	    points += (int) (amount - 50);
+	int points = RewardConstants.ZERO;
+	if (amount > RewardConstants.UPPER_LIMIT)
+	    points += (int) (RewardConstants.TWO_POINTS * (amount - RewardConstants.UPPER_LIMIT))
+		    + RewardConstants.LOWER_LIMIT;
+	else if (amount > RewardConstants.LOWER_LIMIT)
+	    points += (int) (amount - RewardConstants.LOWER_LIMIT);
 	return points;
     }
 

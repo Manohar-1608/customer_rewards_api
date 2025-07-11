@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class RewardPointsService {
 	DateTimeFormatter fmt = DateTimeFormatter.ofPattern(RewardConstants.MONTH_FORMAT);
 
 	for (Transaction txn : customerTxns) {
-	    int points = calculatePoints(txn.getAmount());
+	    int points = pointsCalculator.apply(txn.getAmount());
 	    String month = txn.getDate().format(fmt);
 	    monthlyPoints.put(month, monthlyPoints.getOrDefault(month, RewardConstants.ZERO) + points);
 	    total += points;
@@ -58,14 +59,9 @@ public class RewardPointsService {
 	return rewardPointsDTO;
     }
 
-    private int calculatePoints(double amount) {
-	int points = RewardConstants.ZERO;
-	if (amount > RewardConstants.UPPER_LIMIT)
-	    points += (int) (RewardConstants.TWO_POINTS * (amount - RewardConstants.UPPER_LIMIT))
-		    + RewardConstants.LOWER_LIMIT;
-	else if (amount > RewardConstants.LOWER_LIMIT)
-	    points += (int) (amount - RewardConstants.LOWER_LIMIT);
-	return points;
-    }
+    Function<Double, Integer> pointsCalculator = (amount) -> amount > RewardConstants.UPPER_LIMIT
+	    ? (int) (RewardConstants.TWO_POINTS * (amount - RewardConstants.UPPER_LIMIT)) + RewardConstants.LOWER_LIMIT
+	    : amount > RewardConstants.LOWER_LIMIT ? (int) (amount - RewardConstants.LOWER_LIMIT)
+		    : RewardConstants.ZERO;
 
 }

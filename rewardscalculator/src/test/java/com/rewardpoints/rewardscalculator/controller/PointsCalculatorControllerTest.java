@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.format.DateTimeFormatter;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,21 +24,26 @@ public class PointsCalculatorControllerTest {
     @MockitoBean
     private RewardPointsService rewardPointsService;
 
-    DateTimeFormatter fmt = DateTimeFormatter.ofPattern(RewardConstants.MONTH_FORMAT);
+	public static final String MONTH_FORMAT = "yyyy-MM";
 
-    class ValidationTests {
+
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern(MONTH_FORMAT);
+
+    //class ValidationTests {
 
 	@Test
+	@DisplayName("")
 	void shouldReturnBadRequestForBlankCustomerId() throws Exception {
 	    mockMvc.perform(get("/api/reward-points/count-points").param("customerId", "  ").param("from", "2024-05-01")
 		    .param("to", "2024-06-01")).andExpect(status().isBadRequest());
 	}
 
 	@Test
+	@DisplayName("")
 	void shouldReturnBadRequestForInvalidDateRange() throws Exception {
 	    mockMvc.perform(get("/api/reward-points/count-points").param("customerId", "C1").param("from", "2024-07-01")
 		    .param("to", "2024-06-01")).andExpect(status().isBadRequest());
 	}
 
-    }
+   // }
 }

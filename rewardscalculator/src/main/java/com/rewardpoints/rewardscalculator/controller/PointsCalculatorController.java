@@ -20,22 +20,22 @@ public class PointsCalculatorController {
     private final RewardPointsService rewardService;
 
     public PointsCalculatorController(RewardPointsService rewardService) {
-	this.rewardService = rewardService;
+        this.rewardService = rewardService;
     }
 
     @GetMapping(value = "/count-points")
     public ResponseEntity<RewardPointsDTO> getRewards(@RequestParam String customerId,
-	    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-	    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-	if (customerId == null || customerId.isBlank()) {
-	    throw new IllegalArgumentException("Customer ID must not be null or blank.");
-	}
+        if (customerId == null || customerId.isBlank()) {
+            throw new IllegalArgumentException("Customer ID must not be null or blank.");
+        }
 
-	if (from == null || to == null || from.isAfter(to)) {
-	    throw new IllegalArgumentException("Invalid date range: 'from' must be before 'to'. ");
-	}
+        if (from == null || to == null || from.isAfter(to)) {
+            throw new IllegalArgumentException("Invalid date range: 'fromDate [" + from + "]' must be before 'toDate [" + to + "].");
+        }
 
-	return new ResponseEntity<>(rewardService.calculateRewards(customerId, from, to), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(rewardService.calculateRewards(customerId, from, to), HttpStatus.ACCEPTED);
     }
 }

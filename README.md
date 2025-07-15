@@ -37,20 +37,22 @@ The results are grouped by customer and by month.
 ## Getting Started
 
 ### 1. Clone the Repository 
-
+```bash
 git clone https://github.com/Manohar-1608/customer_rewards_api
 cd customer_rewards_api
+```
 
 ### 2. Run the Application
-
+```bash
 mvn spring-boot:run
+```
 
 📨 API Endpoint
-
+```
 GET /api/reward-points/count-points?customerId=C1&to=2025-07-01&from=2025-04-01
-
+```
 ### Sample Response:
-
+```json
 {
     "customerId": "C1",
     "customerName": "Mohan",
@@ -60,6 +62,7 @@ GET /api/reward-points/count-points?customerId=C1&to=2025-07-01&from=2025-04-01
     },
     "totalPoints": 115
 }
+```
 
 
 
